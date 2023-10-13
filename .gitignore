@@ -1,0 +1,14 @@
+*.asv
+
+*.m~
+
+*.mat
+
+*.fig
+
+*.png
+
+results/
+
+
+
