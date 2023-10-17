@@ -20,7 +20,6 @@ run.rippleRateRZ = 0;
 %% run stuff
 
 if run.behaviorAnalysis 
-%     cf_getbehavior_recordings(dirs, params, allindex, metadata)
     cf_getbehavior_recordings_table(dirs, params, allindex, metadata)
 end
 
@@ -34,9 +33,6 @@ if run.currPositionDecoding
 end
 
 if run.thetaSeqDecoding
-%     cf_decoding_thetaseq(dirs, params, allindex, metadata, 'full', 'all')
-%     cf_decoding_thetaseq(dirs, params, allindex, metadata, 'd2r', 'all')
-    %cf_decoding_thetaseq(dirs, params, allindex, metadata, 'd2r', 'oldPC')
     cf_decoding_thetaseq_table_ctrlspeed(dirs, params, allindex, metadata, 'd2r', 'PC') % correct control speed
 end
 
@@ -44,10 +40,6 @@ if run.rippleDecoding
 %     allindex = allindex(allindex(:,2) == 200831,:); %example day
     %cf_decoding_ripples(dirs, params, allindex, metadata, 'd2r', 'PC')
     cf_decoding_ripples_table(dirs, params, allindex, metadata, 'd2r', 'PC')
-end
-
-if run.flickerSequences
-    cf_flicker_timesequences(dirs, params, allindex, metadata, 'd2r', 'PYR')
 end
 
 if run.rippleProperties

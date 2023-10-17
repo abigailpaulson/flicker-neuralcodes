@@ -627,15 +627,6 @@ PCRbins = [-1 -0.1 0.1 1];
 iQ = binID; 
 
 %%% plot
-% ALP 5/18/23 seems like after flicker the extreme values (1st and 4th
-% quartiles) have similar velocity behavior. Other potential things of
-% interest are that before flicker more prospective coding seems to
-% correspond to earlier licking via the histogram - maybe this corresponds
-% to getting reward earlier? 
-%
-%After flicker it seems like the licking bump is more exaggerated after
-%flicker, though the initial increase in licking is at the same position.
-%Could this indicate moving though the reward zone more quickly? Not sure
 clear g
 g(1,1) = gramm('x', repmat(params.posEdges(1:end-1), [height(AllData),1]), 'y', allTMetrics.vel_h, 'lightness', iQ, 'subset', AllData.fullTrial==1 & AllData.engaged ==1 & AllData.rewarded == 1);
 g(1,1).facet_grid([], cellstr(AllData.timepoint));
@@ -674,17 +665,6 @@ end
 
 
 %% scatter plots
-% I'm going to try some scatter plots of PCR vs. behavior metrics
-% from looking at plots, it would be interesting to see. Jut going to do
-% the ones I have now to start with . would also be nice to try and look at
-% where the slowing starts? It seems like there is a fair number of trials
-% where the slowing starts later. I wonder if that is essentially just more
-% speed in the reward zone. If I wanted to quantify where it starts, I
-% could try smoothing the velocity (too noisy w/out) and taking the
-% derivative. get the first - slope within a region of interest and find
-% the position. from looking at these plots I would think more extreme PCR
-% means higher AZ speed and more PCR mean more RZ speed? and more overall
-% trial speed
 fnames = {'lickDI', 'nLicks', 'licklatency_s', 'duration', 'trial_speed', ...
     'AZ_speed', 'RZ_speed', 'Ctrl_speed', 'AZ_speed_slope', 'AZ_lick_slope'};
 
