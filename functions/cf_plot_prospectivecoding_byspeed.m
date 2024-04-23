@@ -133,6 +133,42 @@ ylim([-0.5 0.75])
 yticks([-0.5 0 0.5])
 ylabel('Prospective coding ratio')
 title('post reward PCR')
+iPlot = iPlot + 1;
+
+% plot time to next reward zone
+% load data, from 'script_cf_plot_time2nextRZ.m'
+figdatadir = '\\ad.gatech.edu\bme\labs\singer\Abby\code\chronicflicker-ephys-prospectivecoding\results\behavior\';
+filename = 'Time2NextRZ_PostDataOnly_MedianSpeedSplit_PerTrial.mat';
+load([figdatadir, filename])
+
+axes(ax{iPlot})
+hold on
+vdat = []; cmat = []; datforstats = [];
+for g = 1:2
+    isGroup = strcmp(Time2NextRZ.group, gnames{g});
+    for s = 1:2
+        isPlotTrial = isGroup & (Time2NextRZ.ctrl_speed_subset == s);
+        vdat.([gnames{g}, '_', num2str(s)]) = Time2NextRZ.time_s(isPlotTrial);
+        datforstats{s} = Time2NextRZ.time_s(isPlotTrial);
+        cmat = [cmat; c.(gnames{g}).(snames{s})];
+    end
+     cf_stats2txt2(datforstats, statfid, panelL{iStat}, 'trials', 'time2NextRZ', 'Ctrl_speed', snames, tablefilename)
+    iStat = iStat + 1;
+end
+violinplot_half(vdat, [], 'ViolinColorMat', cmat, 'ShowData', false, 'BoxWidth', 0.018, 'MedianSize', 40, 'ViolinAlpha', 0.4);
+xticklabels({'slow', 'fast', 'slow', 'fast'})
+ylim([0 120])
+ylabel('Time (s)')
+title('Time to next reward zone')
+
+
+
+
+
+
+
+
+
 
 
 
