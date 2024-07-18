@@ -254,6 +254,7 @@ writetable(StatsData, fullfile(statsdir, filename))
 %%% set up per day data for stats
 DayData.animal = animal';
 DayData.group = groups';
+DayData.days = days;
 DayData.avg_PCR_RRZ_Correct = avgCorrect';
 DayData.avg_PCR_RRZ_Unengaged = avgUnengaged';
 DayData.avg_PCR_RRZ_difference = avgDayDiff'; 
