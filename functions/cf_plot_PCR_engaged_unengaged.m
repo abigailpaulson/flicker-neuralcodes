@@ -50,6 +50,7 @@ for z = 1:2
     vdat.(['rewarded', num2str(z)]) = PlotData.PCR_loc_trial(isPlotTrial);
     datforstats{z} = PlotData.PCR_loc_trial(isPlotTrial);
 end
+disp(['Both Groups - There are ', num2str(length(unique(PlotData.animal))), ' animals contributing to engaged/unengaged analysis'])
 cmat = greycolors; 
 violinplot_half(vdat, [], 'ViolinColorMat', cmat, 'ShowData', false, 'BoxWidth', 0.018, 'MedianSize', 40, 'ViolinAlpha', 0.4);
 ylim([-0.75 0.75])
@@ -79,6 +80,8 @@ for g = [1,2]
     end
     cf_stats2txt2(datforstats, statfid, panelL{iStat}, 'trials', 'PCR engaged/un group', ...
         'prospective coding ratio', {[gnames{g}, ' unengaged'], [gnames{g}, ' engaged']}, tablefilename)
+    
+    disp([gnames{g} ' - There are ', num2str(length(unique(PlotData.animal(isGroup)))), ' animals contributing to engaged/unengaged analysis'])
     datforstats = [];
     iStat = iStat +1;
 end
@@ -109,6 +112,9 @@ for g = [1,2]
     b.FaceAlpha = 0.6;
     er = errorbar(xplotvals(g,:), mn, sem, 'Color','k');
     er.LineStyle = 'none';
+    
+    disp([gnames{g} ' - There are ', num2str(length(unique(animal(isGroup)))), ' animals contributing to engaged/unengaged per day analysis'])
+
     
     mn = []; sem = [];
 end
