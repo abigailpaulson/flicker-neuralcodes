@@ -3,7 +3,7 @@ function cf_decoding_ripples_table(dirs, params, allindex, metadata, posType, ce
 %   get bayesian decoding during ripples
 %ALP 1/9/2023
 
-rewrite.decodingfiles = 0;
+rewrite.decodingfiles = 1;
 
 %%% set any necessary parameters
 params.minRippleDur = 0.015; % in s
@@ -13,7 +13,7 @@ if strcmp(posType, 'full')
     params.posEdges = 0:2:360;
     params.posBins = 2;
     dType = '360';
-    nDeg = 360;
+    params.nDeg = 360;
     posName = 'theta';
     params.RZ = [54 72; 234 252];
     dec_edges = 0:6:360;
@@ -133,11 +133,13 @@ if ~exist([savedir, savefilename], 'file') || rewrite.decodingfiles
             decoding_window = cf_rippledecoding_window(index(i,:), trainingData, tmpBehavior.time, tmpBehavior.(posName), tmpSpikeStruct, rippleWindows, rippleMids, params, inclCells, nCells);
             
             rippleposition = decoding_bins.ripplePos;
+            rippleMidTimes = rippleMids; 
             rippleRatio = decoding_bins.rippleRatio;
             rippleDecPos = decoding_window.rippleDecPos;
             rippleRelPos = decoding_window.rippleRelPos;
             rippleDurationS = tmpDurationS(inclRipple);
             rippleSize = tmpSize(inclRipple);
+            rippleSigNonLocal = decoding_bins.sigOtherZone';
             dayData(i).decoding_bins = decoding_bins;
             dayData(i).decoding_window = decoding_window;
             
@@ -151,8 +153,8 @@ if ~exist([savedir, savefilename], 'file') || rewrite.decodingfiles
             group = repmat(metadata.Groups(d), length(rippleposition),1);
             
             tmpData = table(animal, day, timepoint, group, rippleposition, ...
-                rippleRatio, rippleDecPos, rippleRelPos, gammapower_CA1_z, ...
-                gammapower_CA3_z, rippleDurationS, rippleSize);
+                rippleMidTimes, rippleRatio, rippleDecPos, rippleRelPos, gammapower_CA1_z, ...
+                gammapower_CA3_z, rippleDurationS, rippleSize, rippleSigNonLocal);
             AllData = [AllData; tmpData];
             
             
@@ -189,7 +191,7 @@ if ~exist([savedir, savefilename], 'file') || rewrite.decodingfiles
     
     save([savedir, savefilename], 'AllData', 'dayInfo', '-v7.3')
     
-    statsfilename = 'TableData_RippleDecoding_SWR.txt';
+    statsfilename = ['TableData_RippleDecoding_SWR_', dType, '.txt'];
     writetable(AllData, fullfile(statsdir, statsfilename))
 else
     load([savedir, savefilename])
