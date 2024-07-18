@@ -4,7 +4,7 @@ clear; close all
 
 %%% load behavior data
 filedir = ['\\ad.gatech.edu\bme\labs\singer\Abby\code\chronicflicker-ephys-prospectivecoding\results\behavior\'];
-filename = ['behavioranalysis_prepost_recordings_table_v2.mat'];
+filename = ['behavioranalysis_prepost_recordings_table.mat'];
 load([filedir, filename])
 
 %%% load theta seq decoding data
@@ -413,6 +413,37 @@ filename = 'prop_sigOtherZone_perday_360decoding_byTrialSpeed';
 % filename = 'prop_sigOtherZone_perday_360decoding_byTrialSpeed';
 %savefigALP(figdir, filename, 'filetype', 'pdf', 'date', 1)
 
+%%% get data in a format for figures, RRZ vs. control plot
+days = unique(PlotData.day);
+nTrials = []; nS_RZ = []; propS_RZ = []; nS_ctrl = []; propS_ctrl = [];
+for d = 1:length(days)
+    isDay = PlotData.day == days(d);
+    nTrials = sum(isDay);
+    nS_RZ = sum(PlotData.sig_otherpos_RRZ(isDay));
+    propS_RZ = nS_RZ./nTrials;
+    
+    nS_ctrl = sum(PlotData.sig_otherpos_ctrl(isDay));
+    propS_ctrl = nS_ctrl./nTrials;
+    
+    DayData = PlotData(isDay,:);
+    group = DayData.group(1);
+    animal = DayData.animal(1);
+    
+    PropOtherZone(d).propNonLocal_RZ = propS_RZ;
+    PropOtherZone(d).propNonLocal_Ctrl = propS_ctrl;
+    PropOtherZone(d).group = group;
+    PropOtherZone(d).animal = animal;
+    PropOtherZone(d).day = days(d); 
+end
+
+%%% the way it is formatted above won't work for running stats. Need a 1/2
+%%% classification to factorize it
+PropOtherZoneStats.group = [[PropOtherZone.group]'; [PropOtherZone.group]'];
+PropOtherZoneStats.animal = [[PropOtherZone.animal]'; [PropOtherZone.animal]'];
+PropOtherZoneStats.day = [[PropOtherZone.day]'; [PropOtherZone.day]'];
+PropOtherZoneStats.propNonLocal = [[PropOtherZone.propNonLocal_RZ]'; [PropOtherZone.propNonLocal_Ctrl]'];
+PropOtherZoneStats.propNonLocal_type = [ones(length([PropOtherZone.propNonLocal_RZ]),1); 2*ones(length([PropOtherZone.propNonLocal_Ctrl]),1)];
+
 %%% plot --- get proportion of trials/day with significant reward zone
 %%% decoding
 nS = []; propS = [];
@@ -517,14 +548,20 @@ statsdir = '\\ad.gatech.edu\bme\labs\singer\Abby\code\chronicflicker-ephys-prosp
 filename = 'TableData_DayData_360Decoding_ThetaSeq_PCR_OtherZoneDecoding.txt';
 writetable(StatsDataDay, fullfile(statsdir, filename))
 
+StatsDataDayAllSpeed = struct2table(PropOtherZoneStats);
+statsdir = '\\ad.gatech.edu\bme\labs\singer\Abby\code\chronicflicker-ephys-prospectivecoding\results\LMM_R\';
+filename = 'TableData_DayData_360Decoding_ThetaSeq_PCR_OtherZoneDecoding_NoSpeedSplit.txt';
+writetable(StatsDataDayAllSpeed, fullfile(statsdir, filename))
+
 %% save data for figures
 
 OtherZonesTrial = StatsData;
-OtherZonesDay = StatsDataDay;
+OtherZonesDaySpeed = StatsDataDay;
+OtherZonesDay = PropOtherZone;
 
 seqdir = ['\\ad.gatech.edu\bme\labs\singer\Abby\code\chronicflicker-ephys-prospectivecoding\results\decoding_thetaseq\']; 
 filename = 'ThetaSeq_360decoding_trialdata_PCR_otherzonedecoding.mat';
-save([seqdir, filename], 'OtherZonesTrial', 'OtherZonesDay')
+save([seqdir, filename], 'OtherZonesTrial', 'OtherZonesDay', 'OtherZonesDaySpeed')
 
 
 
