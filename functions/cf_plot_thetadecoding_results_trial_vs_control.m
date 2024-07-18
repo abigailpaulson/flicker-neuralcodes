@@ -23,7 +23,7 @@ axes(ax{iPlot})
 %plot([0 10], [0 0], 'k-', 'LineWidth', 0.5)
 vdat = []; cmat = []; datforstats = [];
 for g = [1,2]
-    for s = [2,1]
+    for s = [2,1] %%% here PCRtype = 2 is the control zone, PCRtype = 1 is the RRZ (see script_cf_plot_PCR_controlZone.m)
         isGroup = strcmp(PlotData.group, gnames{g});
         isPlotTrial = isGroup & PlotData.PCRtype == s;
         datforstats{s} = PlotData.PCR_trial(isPlotTrial);
@@ -34,7 +34,7 @@ for g = [1,2]
     iStat = iStat+1;
     datforstats = [];
 end
-violinplot_half(vdat, [], 'ViolinColorMat', cmat, 'ShowData', false, 'BoxWidth', 0.018, 'MedianSize', 40, 'ViolinAlpha', 0.4);
+violinplot_half(vdat, [], 'ViolinColorMat', cmat, 'ShowData', false, 'BoxWidth', 0.018, 'MedianSize', 25, 'ViolinAlpha', 0.4);
 ylim([-0.75 0.75])
 xlim([0.5 2.5])
 xticklabels({'Control', 'Rewarded', 'Control', 'Rewarded'})
