@@ -63,28 +63,66 @@ clear datforstats
 iPlot = iPlot+1;
 
 %% plot distribution of relative decoded positions for all ripples
+% err_edges = -90:18:90; 
+% plot_err_edges = err_edges(1:end-1)+9;
+% axes(ax{iPlot})
+% hold on
+% d = 2;
+% for g = 1:length(gnames)
+%     tmpdat = [];
+%     isGroup = strcmp(PlotData.group, gnames{g});
+%     tmpdat = PlotData.rippleRelPos(isGroup);
+%     %correct x axis as needed
+%     tmpdat(tmpdat > 90) = tmpdat(tmpdat > 90) - 180;
+%     tmpdat(tmpdat < -90) = tmpdat(tmpdat < -90) + 180;
+%     
+%     %get normalized histogram
+%     err_h = histcounts(tmpdat, err_edges);
+%     err_nh = err_h./sum(err_h);
+%     
+%     plot(plot_err_edges, err_nh, 'Color', groupcolors.(gnames{g}).(dnames{d}), 'LineWidth', 2)
+% end
+% xlim([-90 90])
+% xticks([-90 0 90])
+% ylim([0 0.3])
+% yticks([0 0.1 0.2 0.3])
+% ylabel('Fraction of ripples')
+% xlabel('Relative decoded position (deg)')
+% iPlot = iPlot + 1;
+
+%% plot distribution of relative decoded positions for all ripples
+% try this plot per day
 err_edges = -90:18:90; 
 plot_err_edges = err_edges(1:end-1)+9;
 axes(ax{iPlot})
 hold on
 d = 2;
 for g = 1:length(gnames)
-    tmpdat = [];
     isGroup = strcmp(PlotData.group, gnames{g});
-    tmpdat = PlotData.rippleRelPos(isGroup);
-    %correct x axis as needed
-    tmpdat(tmpdat > 90) = tmpdat(tmpdat > 90) - 180;
-    tmpdat(tmpdat < -90) = tmpdat(tmpdat < -90) + 180;
+    days = unique(PlotData.day(isGroup));
+    grpDat = [];
+    for d = 1:length(days)
+        isDay = PlotData.day == days(d);
+        tmpdat = [];
+        tmpdat = PlotData.rippleRelPos(isGroup&isDay);
+        %correct x axis as needed
+        tmpdat(tmpdat > 90) = tmpdat(tmpdat > 90) - 180;
+        tmpdat(tmpdat < -90) = tmpdat(tmpdat < -90) + 180;
+        
+        %get normalized histogram
+        err_h = histcounts(tmpdat, err_edges);
+        err_nh = err_h./sum(err_h);
+        grpDat = [grpDat; err_nh];
+    end
     
-    %get normalized histogram
-    err_h = histcounts(tmpdat, err_edges);
-    err_nh = err_h./sum(err_h);
-    
-    plot(plot_err_edges, err_nh, 'Color', groupcolors.(gnames{g}).(dnames{d}), 'LineWidth', 2)
+    mn = mean(grpDat,1,'omitnan');
+    sem = std(grpDat,0,1,'omitnan')./sqrt(sum(~isnan(grpDat(:,1))));
+    shadedErrorBar(plot_err_edges, mn, sem, {'Color', groupcolors.(gnames{g}).(dnames{2}), 'LineWidth', 2}, 1)
+
 end
 xlim([-90 90])
 xticks([-90 0 90])
-ylim([0 0.3])
+%ylim([0 0.3])
 yticks([0 0.1 0.2 0.3])
 ylabel('Fraction of ripples')
 xlabel('Relative decoded position (deg)')
