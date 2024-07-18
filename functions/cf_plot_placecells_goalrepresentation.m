@@ -41,6 +41,8 @@ for d = 1:size(dayindex,1)
     propRRZ_PC = nRRZPC/nPC; 
     
     plotdata(d).propRRZ_PC = propRRZ_PC; 
+    plotdata(d).nRRZPC = nRRZPC;
+    plotdata(d).animal = dayindex(d,1);
     
     clear tmpPC nPC ratemaps peakPos isRRZPc nRRZPC 
 end
@@ -59,11 +61,29 @@ end
 
 inclDay = logical(inclDay');
 
+
+%%% get RRZ cell numbers for plotting
+cellCount.gamma = zeros(max(dayindex(:,1)),2);
+cellCount.random = zeros(max(dayindex(:,1)),2);
+for d = 1:size(dayindex,1)
+    if inclDay(d) && isGamma(d) && isPost(d)
+        cellCount.gamma(dayindex(d,1),1) = cellCount.gamma(dayindex(d,1))+plotdata(d).nRRZPC;
+        cellCount.gamma(dayindex(d,1),2) = 1;
+    else
+        cellCount.random(dayindex(d,1),1) = cellCount.random(dayindex(d,1))+plotdata(d).nRRZPC;
+        cellCount.random(dayindex(d,1),2) = 1;
+    end
+end
+    
+
 %%% get group data for plotting
 groupdata.gamma.pre.propRRZ_PC = [plotdata(isGamma&isPre&inclDay).propRRZ_PC];
 groupdata.gamma.post.propRRZ_PC = [plotdata(isGamma&isPost&inclDay).propRRZ_PC];
 groupdata.random.pre.propRRZ_PC = [plotdata(isRandom&isPre&inclDay).propRRZ_PC];
 groupdata.random.post.propRRZ_PC = [plotdata(isRandom&isPost&inclDay).propRRZ_PC];
+
+disp(['RANDOM there are ', num2str(min(cellCount.random(logical(cellCount.random(:,2)),1))), ' - ', num2str(max(cellCount.random(logical(cellCount.random(:,2)),1))), ' place cells with reward rep'])
+disp(['40 HZ there are ', num2str(min(cellCount.gamma(logical(cellCount.gamma(:,2)),1))), ' - ', num2str(max(cellCount.gamma(logical(cellCount.gamma(:,2)),1))), ' place cells with reward rep'])
 
 
 %%% plot
