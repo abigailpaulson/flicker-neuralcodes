@@ -12,8 +12,10 @@ library(ggplot2)
 
   #load MATLAB output (in table format in .txt) file in R
   foldN = "//ad.gatech.edu/bme/labs/singer/Abby/code/chronicflicker-ephys-prospectivecoding/results/LMM_R/"
+
+  #directory for saving
+  outfoldN = "//ad.gatech.edu/bme/labs/singer/Abby/code/flicker-neuralcodes/results/LMM_R/"
   
- 
   ##### Time 2 Next RZ - D2R ##### 
   ## this data structure only includes correct trials and post data
   ## load data file
@@ -53,7 +55,7 @@ library(ggplot2)
     descript = 'time 2 next RZ per trial'
     comparison = "Speed subset: low vs. high"
     testunit = "trials"
-    significance = '=IF(F2<0.001,"****",IF(F2<0.005,"***",IF(F2<0.01,"**",IF(F2<0.05,"*","ns"))))' #this is the formula for the excel file, it will evaluate in excel
+    significance = '=IF(F2<0.0001,"****",IF(F2<0.001,"***",IF(F2<0.01,"**",IF(F2<0.05,"*","ns"))))' #this is the formula for the excel file, it will evaluate in excel
     
     ## model, anova
     obj.lmer1 = lmerTest::lmer(time_2_next_RZ ~ Ctrl_speed_subset + (1|animal), data = testData)
@@ -122,10 +124,10 @@ library(ggplot2)
     
     ## loop over property types 
     ## set up helpful info for the model
-    descript = 'time 2 next RZ per trial'
-    comparison = "Speed subset: low vs. high"
+    descript = 'rrz PCR'
+    comparison = "median AZ lick number: low higher"
     testunit = "trials"
-    significance = '=IF(F2<0.001,"****",IF(F2<0.005,"***",IF(F2<0.01,"**",IF(F2<0.05,"*","ns"))))' #this is the formula for the excel file, it will evaluate in excel
+    significance = '=IF(F2<0.0001,"****",IF(F2<0.001,"***",IF(F2<0.01,"**",IF(F2<0.05,"*","ns"))))' #this is the formula for the excel file, it will evaluate in excel
     
     ## model, anova
     obj.lmer1 = lmerTest::lmer(PCR_loc_trial ~ Lick_number_subset + (1|animal), data = testData)
@@ -160,6 +162,11 @@ library(ggplot2)
   
   ##### THETA SEQUENCES - Per Trial - Combined Groups - Unengaged vs. Correct Trials ##### 
   
+  ## get today's date and make a subfolder in the output folder
+  date = format(Sys.Date(), "%y%m%d")
+  dir.create(file.path(outfoldN, date), showWarnings = FALSE)
+  savefoldN = file.path(outfoldN,date)
+  
   ## load data file
   fileN = "TableData_TrialData_180Decoding_ThetaSeq_Unengaged_Correct_Trials.txt"
   dt = "thetaseq_Unengaged_correct_pertrial"
@@ -169,8 +176,8 @@ library(ggplot2)
   outputStats = data.frame()
   
   tblFilename = paste0(foldN, fileN)
-  txtFilename = paste0(foldN, "/stats_lme4_", dt, ".txt") #create text file to save LMM outputs 
-  csvFilename = paste0(foldN, "/stats_lme4_", dt, '.csv') #create a csv that can be used for supplement table
+  txtFilename = paste0(savefoldN, "/stats_lme4_", dt, ".txt") #create text file to save LMM outputs 
+  csvFilename = paste0(savefoldN, "/stats_lme4_", dt, '.csv') #create a csv that can be used for supplement table
   
   #read data
   mydata <- read.csv(tblFilename, head=T)
@@ -192,7 +199,7 @@ library(ggplot2)
     descript = pt
     comparison = "unengaged vs. correct trials both groups "
     testunit = "trial"
-    significance = '=IF(F2<0.001,"****",IF(F2<0.005,"***",IF(F2<0.01,"**",IF(F2<0.05,"*","ns"))))' #this is the formula for the excel file, it will evaluate in excel
+    significance = '=IF(F2<0.0001,"****",IF(F2<0.001,"***",IF(F2<0.01,"**",IF(F2<0.05,"*","ns"))))' #this is the formula for the excel file, it will evaluate in excel
     
     ## model, anova
     obj.lmer1 = lmerTest::lmer(get(pt) ~ isUnengaged + (1|animal), data = testData)
@@ -232,12 +239,17 @@ library(ggplot2)
   propTypes <-c("PCR_loc_trial")
   groupTypes <-c ("random", "gamma")
   
+  ## get today's date and make a subfolder in the output folder
+  date = format(Sys.Date(), "%y%m%d")
+  dir.create(file.path(outfoldN, date), showWarnings = FALSE)
+  savefoldN = file.path(outfoldN,date)
+  
   #initialize table structure to add stats to
   outputStats = data.frame()
   
   tblFilename = paste0(foldN, fileN)
-  txtFilename = paste0(foldN, "/stats_lme4_", dt, ".txt") #create text file to save LMM outputs 
-  csvFilename = paste0(foldN, "/stats_lme4_", dt, '.csv') #create a csv that can be used for supplement table
+  txtFilename = paste0(savefoldN, "/stats_lme4_", dt, ".txt") #create text file to save LMM outputs 
+  csvFilename = paste0(savefoldN, "/stats_lme4_", dt, '.csv') #create a csv that can be used for supplement table
   
   #initialize text file
   close(file(txtFilename, open="w" ) )
@@ -262,7 +274,7 @@ library(ggplot2)
     descript = 'time 2 next RZ per trial'
     comparison = "Speed subset: low vs. high"
     testunit = "trials"
-    significance = '=IF(F2<0.001,"****",IF(F2<0.005,"***",IF(F2<0.01,"**",IF(F2<0.05,"*","ns"))))' #this is the formula for the excel file, it will evaluate in excel
+    significance = '=IF(F2<0.0001,"****",IF(F2<0.001,"***",IF(F2<0.01,"**",IF(F2<0.05,"*","ns"))))' #this is the formula for the excel file, it will evaluate in excel
     
     ## model, anova
     obj.lmer1 = lmerTest::lmer(PCR_loc_trial ~ isUnengaged + (1|animal), data = testData)
@@ -304,17 +316,23 @@ library(ggplot2)
   rm(testData)
   rm(obj.lmer1)
   rm(lmer1anova)
+  
   fileN = "TableData_DayData_180Decoding_ThetaSeq_Unengaged_Correct.txt"
   dt = "thetaseq_Unengaged_correct_perDay_pergroup"
   propTypes <-c("avg_PCR_RRZ_difference")
   groupTypes <-c ("random", "gamma")
   
+  ## get today's date and make a subfolder in the output folder
+  date = format(Sys.Date(), "%y%m%d")
+  dir.create(file.path(outfoldN, date), showWarnings = FALSE)
+  savefoldN = file.path(outfoldN,date)
+  
   #initialize table structure to add stats to
   outputStats = data.frame()
   
   tblFilename = paste0(foldN, fileN)
-  txtFilename = paste0(foldN, "/stats_lme4_", dt, ".txt") #create text file to save LMM outputs 
-  csvFilename = paste0(foldN, "/stats_lme4_", dt, '.csv') #create a csv that can be used for supplement table
+  txtFilename = paste0(savefoldN, "/stats_lme4_", dt, ".txt") #create text file to save LMM outputs 
+  csvFilename = paste0(savefoldN, "/stats_lme4_", dt, '.csv') #create a csv that can be used for supplement table
   
   #initialize text file
   close(file(txtFilename, open="w" ) )
@@ -338,7 +356,7 @@ library(ggplot2)
     descript = 'time 2 next RZ per trial'
     comparison = "Speed subset: low vs. high"
     testunit = "trials"
-    significance = '=IF(F2<0.001,"****",IF(F2<0.005,"***",IF(F2<0.01,"**",IF(F2<0.05,"*","ns"))))' #this is the formula for the excel file, it will evaluate in excel
+    significance = '=IF(F2<0.0001,"****",IF(F2<0.001,"***",IF(F2<0.01,"**",IF(F2<0.05,"*","ns"))))' #this is the formula for the excel file, it will evaluate in excel
     
     ## model, anova
     obj.lmer1 = lmerTest::lmer(avg_PCR_RRZ_difference ~ group + (1|animal), data = testData)
@@ -410,7 +428,7 @@ library(ggplot2)
       descript = 'PCR RRZ vs Ctrl'
       comparison = "RRZ vs. Ctrl"
       testunit = "trials"
-      significance = '=IF(F2<0.001,"****",IF(F2<0.005,"***",IF(F2<0.01,"**",IF(F2<0.05,"*","ns"))))' #this is the formula for the excel file, it will evaluate in excel
+      significance = '=IF(F2<0.0001,"****",IF(F2<0.001,"***",IF(F2<0.01,"**",IF(F2<0.05,"*","ns"))))' #this is the formula for the excel file, it will evaluate in excel
       
       ## model, anova
       obj.lmer1 = lmerTest::lmer(PCR_trial ~ PCRtype + (1|animal), data = testData)
@@ -481,7 +499,7 @@ library(ggplot2)
       descript = 'Ctrl speed Other zone vs. not'
       comparison = "Other zone decoding vs not"
       testunit = "trials"
-      significance = '=IF(F2<0.001,"****",IF(F2<0.005,"***",IF(F2<0.01,"**",IF(F2<0.05,"*","ns"))))' #this is the formula for the excel file, it will evaluate in excel
+      significance = '=IF(F2<0.0001,"****",IF(F2<0.001,"***",IF(F2<0.01,"**",IF(F2<0.05,"*","ns"))))' #this is the formula for the excel file, it will evaluate in excel
       
       ## model, anova
       obj.lmer1 = lmerTest::lmer(Ctrl_speed ~ sig_otherpos_RRZ + (1|animal), data = testData)
@@ -552,7 +570,7 @@ library(ggplot2)
       descript = 'LIckDI Other zone vs. not'
       comparison = "Other zone decoding vs not"
       testunit = "trials"
-      significance = '=IF(F2<0.001,"****",IF(F2<0.005,"***",IF(F2<0.01,"**",IF(F2<0.05,"*","ns"))))' #this is the formula for the excel file, it will evaluate in excel
+      significance = '=IF(F2<0.0001,"****",IF(F2<0.001,"***",IF(F2<0.01,"**",IF(F2<0.05,"*","ns"))))' #this is the formula for the excel file, it will evaluate in excel
       
       ## model, anova
       obj.lmer1 = lmerTest::lmer(LickDI ~ sig_otherpos_RRZ + (1|animal), data = testData)
@@ -623,7 +641,7 @@ library(ggplot2)
       descript = 'lick latency Other zone vs. not'
       comparison = "Other zone decoding vs not"
       testunit = "trials"
-      significance = '=IF(F2<0.001,"****",IF(F2<0.005,"***",IF(F2<0.01,"**",IF(F2<0.05,"*","ns"))))' #this is the formula for the excel file, it will evaluate in excel
+      significance = '=IF(F2<0.0001,"****",IF(F2<0.001,"***",IF(F2<0.01,"**",IF(F2<0.05,"*","ns"))))' #this is the formula for the excel file, it will evaluate in excel
       
       ## model, anova
       obj.lmer1 = lmerTest::lmer(licklatency_s ~ sig_otherpos_RRZ + (1|animal), data = testData)
@@ -694,7 +712,7 @@ library(ggplot2)
       descript = 'Ctrl speed Other zone vs. not'
       comparison = "Other zone decoding vs not"
       testunit = "trials"
-      significance = '=IF(F2<0.001,"****",IF(F2<0.005,"***",IF(F2<0.01,"**",IF(F2<0.05,"*","ns"))))' #this is the formula for the excel file, it will evaluate in excel
+      significance = '=IF(F2<0.0001,"****",IF(F2<0.001,"***",IF(F2<0.01,"**",IF(F2<0.05,"*","ns"))))' #this is the formula for the excel file, it will evaluate in excel
       
       ## model, anova
       obj.lmer1 = lmerTest::lmer(Ctrl_speed ~ isNonLocal + (1|animal), data = testData)
@@ -765,7 +783,7 @@ library(ggplot2)
       descript = 'Lick DI Other zone vs. not'
       comparison = "Other zone decoding vs not"
       testunit = "trials"
-      significance = '=IF(F2<0.001,"****",IF(F2<0.005,"***",IF(F2<0.01,"**",IF(F2<0.05,"*","ns"))))' #this is the formula for the excel file, it will evaluate in excel
+      significance = '=IF(F2<0.0001,"****",IF(F2<0.001,"***",IF(F2<0.01,"**",IF(F2<0.05,"*","ns"))))' #this is the formula for the excel file, it will evaluate in excel
       
       ## model, anova
       obj.lmer1 = lmerTest::lmer(lickDI ~ isNonLocal + (1|animal), data = testData)
@@ -836,7 +854,7 @@ library(ggplot2)
       descript = 'Lick Latency Other zone vs. not'
       comparison = "Other zone decoding vs not"
       testunit = "trials"
-      significance = '=IF(F2<0.001,"****",IF(F2<0.005,"***",IF(F2<0.01,"**",IF(F2<0.05,"*","ns"))))' #this is the formula for the excel file, it will evaluate in excel
+      significance = '=IF(F2<0.0001,"****",IF(F2<0.001,"***",IF(F2<0.01,"**",IF(F2<0.05,"*","ns"))))' #this is the formula for the excel file, it will evaluate in excel
       
       ## model, anova
       obj.lmer1 = lmerTest::lmer(licklatency_s ~ isNonLocal + (1|animal), data = testData)
@@ -869,7 +887,7 @@ library(ggplot2)
       
     }
     
-    ##### proportion of trials with unoccupied zone decoding by fast/slow ##### 
+    ##### THETA SEQUENCES - PER DAY - By Group and Speed Type - Prop Unoccupied zone decoding ##### 
     ## this data structure only includes correct trials and post data
     ## load data file
     fileN = "TableData_DayData_360Decoding_ThetaSeq_PCR_OtherZoneDecoding.txt"
@@ -907,7 +925,7 @@ library(ggplot2)
       descript = 'prop trials with unoccupied zone decoding by speed type'
       comparison = "within group across speed types"
       testunit = "days"
-      significance = '=IF(F2<0.001,"****",IF(F2<0.005,"***",IF(F2<0.01,"**",IF(F2<0.05,"*","ns"))))' #this is the formula for the excel file, it will evaluate in excel
+      significance = '=IF(F2<0.0001,"****",IF(F2<0.001,"***",IF(F2<0.01,"**",IF(F2<0.05,"*","ns"))))' #this is the formula for the excel file, it will evaluate in excel
       
       ## model, anova
       obj.lmer1 = lmerTest::lmer(propNonLocal ~ speedType + (1|animal), data = testData)
@@ -939,3 +957,151 @@ library(ggplot2)
       write.csv(outputStats, csvFilename)
       
     }
+    
+    ##### THETA DECODING - PER DAY - By Group and Unoccupied Zone - Prop trials ##### 
+    ## this data structure only includes correct trials and post data
+    ## load data file
+    fileN = "TableData_DayData_360Decoding_ThetaSeq_PCR_OtherZoneDecoding_NoSpeedSplit.txt"
+    dt = "thetadecoding_DayData_360Decoding_ThetaSeq_PCR_PropTrials_withUnoccupiedZone_CtrlvsRRZ"
+    propTypes <-c("proptrials_byotherzonedecoding_CtrlvsRRZ")
+    groupTypes <-c ("random", "gamma")
+    
+    ## get today's date and make a subfolder in the output folder
+    date = format(Sys.Date(), "%y%m%d")
+    dir.create(file.path(outfoldN, date), showWarnings = FALSE)
+    savefoldN = file.path(outfoldN,date)
+    
+    #initialize table structure to add stats to
+    outputStats = data.frame()
+    
+    tblFilename = paste0(foldN, fileN)
+    txtFilename = paste0(savefoldN, "/stats_lme4_", dt, ".txt") #create text file to save LMM outputs 
+    csvFilename = paste0(savefoldN, "/stats_lme4_", dt, '.csv') #create a csv that can be used for supplement table
+    
+    #initialize text file
+    close(file(txtFilename, open="w" ) )
+    
+    #read data
+    mydata <- read.csv(tblFilename, head=T)
+    
+    for (gt in groupTypes) {
+      ## get data subset of interest
+      testData <- mydata[mydata$group == gt,] 
+      
+      #factorize variables to be treated as categories/levels instead of numerical value
+      testData$animal = as.factor(testData$animal)
+      testData$group = as.factor(testData$group)
+      testData$propNonLocal_type = as.factor(testData$propNonLocal_type)
+      
+      #helpful info for stats (n per group)
+      nUnit = c(sum(testData$propNonLocal_type == 2), sum(testData$propNonLocal_type == 1)) #ctrl is 2, RRZ is 1
+      
+      ## loop over property types 
+      ## set up helpful info for the model
+      descript = 'prop trials with unoccupied zone control or RRZ decoding by group'
+      comparison = "within group across unoccupied zone decoding Ctrl vs RRZ"
+      testunit = "days"
+      significance = '=IF(F2<0.0001,"****",IF(F2<0.001,"***",IF(F2<0.01,"**",IF(F2<0.05,"*","ns"))))' #this is the formula for the excel file, it will evaluate in excel
+      
+      ## model, anova
+      obj.lmer1 = lmerTest::lmer(propNonLocal ~ propNonLocal_type + (1|animal), data = testData)
+      lmer1anova = anova(obj.lmer1, ddf="Kenward-Roger")
+      
+      ## set up strings for the output
+      `Group Size` = paste(gt, " -- n =", as.character(nUnit[1]), "; n =", as.character(nUnit[2]))
+      analysisUnit = "days"
+      `P-value` = round(lmer1anova$`Pr(>F)`, digits = 20)
+      `F-value` = paste("F", as.character(round(lmer1anova$NumDF, digits=5)), ",", as.character(round(lmer1anova$DenDF, digits = 5)), " = ", as.character(round(lmer1anova$`F value`, digits = 5)), sep="")
+      
+      ## compile into output frame
+      tmpStats = data.frame(descript, testunit, comparison, `Group Size`, `P-value`, significance,`F-value`)
+      outputStats = rbind(outputStats, tmpStats)
+      
+      ## output all stats details
+      statStr = paste(gt, "|", descript, "|", comparison, "|", "n =", as.character(nUnit[1]), ", n =", as.character(nUnit[2]), testunit, "|", "p =", as.character(round(lmer1anova$`Pr(>F)`, digits = 5)), "|", "F", as.character(round(lmer1anova$NumDF, digits = 5)), as.character(round(lmer1anova$DenDF, digits = 5)), "=", as.character(round(lmer1anova$`F value`, digits = 5)))
+      
+      sink(txtFilename, append = TRUE)
+      print(paste("~~~~~~~ group = ", gt))
+      print(report(obj.lmer1))
+      print(statStr)
+      print(summary(obj.lmer1))
+      print(anova(obj.lmer1, ddf="Kenward-Roger"))
+      print ("-------------------------------------------------------")
+      sink()
+      closeAllConnections()
+      
+      write.csv(outputStats, csvFilename)
+      
+    }
+    
+    ##### Behavior - Proportion of correct Trials - PER DAY - By Group  ##### 
+    ## this data structure only includes post data with the correct days
+    ## load data file
+    fileN = "TableData_BehaviorPerformance_180_perDay_propCorrect.txt"
+    dt = "behavior_DayData_propcorrecttrials_bygroup"
+    propTypes <-c("proptrials_correct_bygroup")
+    groupTypes <-c ("random", "gamma")
+    
+    ## get today's date and make a subfolder in the output folder
+    date = format(Sys.Date(), "%y%m%d")
+    dir.create(file.path(outfoldN, date), showWarnings = FALSE)
+    savefoldN = file.path(outfoldN,date)
+    
+    #initialize table structure to add stats to
+    outputStats = data.frame()
+    
+    tblFilename = paste0(foldN, fileN)
+    txtFilename = paste0(savefoldN, "/stats_lme4_", dt, ".txt") #create text file to save LMM outputs 
+    csvFilename = paste0(savefoldN, "/stats_lme4_", dt, '.csv') #create a csv that can be used for supplement table
+    
+    #initialize text file
+    close(file(txtFilename, open="w" ) )
+    
+    #read data
+    mydata <- read.csv(tblFilename, head=T)
+    
+      ## get data subset of interest
+      testData <- mydata
+      
+      #factorize variables to be treated as categories/levels instead of numerical value
+      testData$animal = as.factor(testData$animal)
+      testData$group = as.factor(testData$group)
+      
+      #helpful info for stats (n per group)
+      nUnit = c(sum(testData$group == "random"), sum(testData$group == "gamma")) #ctrl is 2, RRZ is 1
+      
+      ## loop over property types 
+      ## set up helpful info for the model
+      descript = 'prop of correct trials'
+      comparison = "across groups"
+      testunit = "days"
+      significance = '=IF(F2<0.0001,"****",IF(F2<0.001,"***",IF(F2<0.01,"**",IF(F2<0.05,"*","ns"))))' #this is the formula for the excel file, it will evaluate in excel
+      
+      ## model, anova
+      obj.lmer1 = lmerTest::lmer(propCorrect ~ group + (1|animal), data = testData)
+      lmer1anova = anova(obj.lmer1, ddf="Kenward-Roger")
+      
+      ## set up strings for the output
+      `Group Size` = paste("random n =", as.character(nUnit[1]), "; 40 Hz n =", as.character(nUnit[2]))
+      analysisUnit = "days"
+      `P-value` = round(lmer1anova$`Pr(>F)`, digits = 20)
+      `F-value` = paste("F", as.character(round(lmer1anova$NumDF, digits=5)), ",", as.character(round(lmer1anova$DenDF, digits = 5)), " = ", as.character(round(lmer1anova$`F value`, digits = 5)), sep="")
+      
+      ## compile into output frame
+      tmpStats = data.frame(descript, testunit, comparison, `Group Size`, `P-value`, significance,`F-value`)
+      outputStats = rbind(outputStats, tmpStats)
+      
+      ## output all stats details
+      statStr = paste("random vs. 40 HZ |", descript, "|", comparison, "|", "n =", as.character(nUnit[1]), ", n =", as.character(nUnit[2]), testunit, "|", "p =", as.character(round(lmer1anova$`Pr(>F)`, digits = 5)), "|", "F", as.character(round(lmer1anova$NumDF, digits = 5)), as.character(round(lmer1anova$DenDF, digits = 5)), "=", as.character(round(lmer1anova$`F value`, digits = 5)))
+      
+      sink(txtFilename, append = TRUE)
+      print(report(obj.lmer1))
+      print(statStr)
+      print(summary(obj.lmer1))
+      print(anova(obj.lmer1, ddf="Kenward-Roger"))
+      print ("-------------------------------------------------------")
+      sink()
+      closeAllConnections()
+      
+      write.csv(outputStats, csvFilename)
+      
