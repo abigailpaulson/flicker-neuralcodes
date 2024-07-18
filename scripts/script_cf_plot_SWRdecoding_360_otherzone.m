@@ -14,7 +14,7 @@ figdir = filedir;
 
 %%% load behavior data
 filedir = ['\\ad.gatech.edu\bme\labs\singer\Abby\code\chronicflicker-ephys-prospectivecoding\results\behavior\'];
-filename = ['behavioranalysis_prepost_recordings_table_v2.mat'];
+filename = ['behavioranalysis_prepost_recordings_table.mat'];
 load([filedir, filename])
 
 %%% set any necessary parameters
@@ -299,7 +299,8 @@ for g = [1,2]
             isPlotTrial = isGroup & PostBehavior.rippleCount >= 1 & PostBehavior.nonlocalRipples >= 1;
         end
         vdat.([gnames{g}, 'rewarded', num2str(z)]) = PostBehavior.Ctrl_speed(isPlotTrial);
-        disp(['unengaged trials ', gnames{g}, ' z = ', num2str(z), ' # trials = ', num2str(sum(isPlotTrial))])
+        disp([' trials ', gnames{g}, ' z = ', num2str(z), ' # trials = ', num2str(sum(isPlotTrial))])
+        disp([' # days = ', num2str(length(unique(PostBehavior.day(isPlotTrial)))), ' # animals ', num2str(length(unique(PostBehavior.animal(isPlotTrial))))])
         cmat = [cmat; params.colors.(gnames{g}).(dnames{z})];
     end
 end
@@ -330,7 +331,7 @@ for g = [1,2]
             isPlotTrial = isGroup & PostBehavior.rippleCount >= 1 & PostBehavior.nonlocalRipples >= 1;
         end
         vdat.([gnames{g}, 'rewarded', num2str(z)]) = PostBehavior.lickDI(isPlotTrial);
-        disp(['unengaged trials ', gnames{g}, ' z = ', num2str(z), ' # trials = ', num2str(sum(isPlotTrial))])
+        disp(['trials ', gnames{g}, ' z = ', num2str(z), ' # trials = ', num2str(sum(isPlotTrial))])
         cmat = [cmat; params.colors.(gnames{g}).(dnames{z})];
     end
 end
@@ -361,7 +362,7 @@ for g = [1,2]
             isPlotTrial = isGroup & PostBehavior.rippleCount >= 1 & PostBehavior.nonlocalRipples >= 1;
         end
         vdat.([gnames{g}, 'rewarded', num2str(z)]) = PostBehavior.licklatency_s(isPlotTrial);
-        disp(['unengaged trials ', gnames{g}, ' z = ', num2str(z), ' # trials = ', num2str(sum(isPlotTrial))])
+        disp(['trials ', gnames{g}, ' z = ', num2str(z), ' # trials = ', num2str(sum(isPlotTrial))])
         cmat = [cmat; params.colors.(gnames{g}).(dnames{z})];
     end
 end
