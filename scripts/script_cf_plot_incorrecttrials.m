@@ -37,11 +37,19 @@ for g = 1:2
         isRew = GroupData.rewarded == 1;
         isFull = GroupData.fullTrial == 1;
         
-        nWrong(d) = sum(isDay&isEng&~isRew&isFull);
-        nUnengaged(d) = sum(isDay&~isEng&~isRew&isFull);
-        nCorrect(d) = sum(isDay&isEng&isRew&isFull);
-        nTot(d) = sum(isDay&isFull);
-        nTotCorr(d) = sum(isDay&isFull&isEng);
+        if sum(isEng&isRew&isDay&isFull) < 5
+            nWrong(d) = NaN;
+            nUnengaged(d) = NaN;
+            nCorrect(d) = NaN;
+            nTot(d) = NaN;
+            nTotCorr(d) = NaN;
+        else
+            nWrong(d) = sum(isDay&isEng&~isRew&isFull);
+            nUnengaged(d) = sum(isDay&~isEng&~isRew&isFull);
+            nCorrect(d) = sum(isDay&isEng&isRew&isFull);
+            nTot(d) = sum(isDay&isFull);
+            nTotCorr(d) = sum(isDay&isFull&isEng);
+        end
     end
     
     scatterdat_wrong{iBar} = nWrong;
@@ -90,7 +98,7 @@ xticks([1 2])
 xticklabels({'40 Hz', 'Random'})
 makefigurepretty(gcf)
 figname = 'count_wrongtrials';
-savefigALP(figdir, figname, 'filetype', 'png')
+%savefigALP(figdir, figname, 'filetype', 'png')
 
 fh = figure('Position', [165 480 257 219]);
 hold on
@@ -106,7 +114,7 @@ xticks([1 2])
 xticklabels({'40 Hz', 'Random'})
 makefigurepretty(gcf)
 figname = 'count_unengagedtrials';
-savefigALP(figdir, figname, 'filetype', 'png')
+%savefigALP(figdir, figname, 'filetype', 'png')
 
 fh = figure('Position', [165 480 257 219]);
 hold on
@@ -122,7 +130,7 @@ xticks([1 2])
 xticklabels({'40 Hz', 'Random'})
 makefigurepretty(gcf)
 figname = 'prop_correcttrials';
-savefigALP(figdir, figname, 'filetype', 'png')
+% savefigALP(figdir, figname, 'filetype', 'png')
 
 fh = figure('Position', [165 480 257 219]);
 hold on
@@ -138,7 +146,7 @@ xticks([1 2])
 xticklabels({'40 Hz', 'Random'})
 makefigurepretty(gcf)
 figname = 'count_correcttrials';
-savefigALP(figdir, figname, 'filetype', 'png')
+%savefigALP(figdir, figname, 'filetype', 'png')
 
 
 fh = figure;
@@ -160,6 +168,73 @@ b.FaceAlpha = 0.6;
 er = errorbar(xplotvals, mn_propuneng, stde_propuneng, 'Color','k');
 er.LineStyle = 'none';
 title('proportion unengaged trials per day')
+
+%%% get proportion correct in a different data format for running stats
+%%% get proportion / number of incorrect trials per day
+
+alldays = unique(PlotData.day);
+
+for d = 1:length(alldays)
+    isDay = PlotData.day == alldays(d);
+    DayData = PlotData(isDay,:);
+    group = unique(DayData.group);
+    PerfData(d).group = group;
+    PerfData(d).animal = unique(DayData.animal);
+    
+    isEng = DayData.engaged == 1;
+    isRew = DayData.rewarded == 1;
+    isFull = DayData.fullTrial == 1;
+    
+    if sum(isEng&isRew&isFull) < 5
+        PerfData(d).nWrong = NaN;
+        PerfData(d).nUnengaged = NaN;
+        PerfData(d).nCorrect = NaN;
+        PerfData(d).nTot = NaN;
+        PerfData(d).nTotCorr = NaN;
+        PerfData(d).propCorrect = NaN;
+    else
+        PerfData(d).nWrong = sum(isEng&~isRew&isFull);
+        PerfData(d).nUnengaged = sum(~isEng&~isRew&isFull);
+        PerfData(d).nCorrect = sum(isEng&isRew&isFull);
+        PerfData(d).nTot = sum(isFull);
+        PerfData(d).nTotCorr = sum(isFull&isEng); %all full and engaged
+        PerfData(d).propCorrect = PerfData(d).nCorrect/PerfData(d).nTotCorr;
+    end
+end
+PerfData = struct2table(PerfData);
+
+%%% plot to check everything looks good
+scatterdat_propcorrect = []; mn_propcorrect = []; sem_propcorrect = []; colororder = [];
+fh = figure;
+hold on
+for g = 1:2
+    isGroup = strcmp(PerfData.group, gnames{g});
+    GroupData = PerfData(isGroup,:);
+    scatterdat_propcorrect{g} = GroupData.nCorrect./GroupData.nTotCorr;
+    mn_propcorrect(g) = nanmean(scatterdat_propcorrect{g});
+    sem_propcorrect(g) = nanstd(scatterdat_propcorrect{g})./sqrt(sum(~isnan(scatterdat_propcorrect{g})));
+    colororder = [colororder; params.colors.(gnames{g}).(dnames{2})];
+end
+plotprettypoints(fh, xplotvals, scatterdat_propcorrect, 'color', colororder)
+b = bar(xplotvals, mn_propcorrect, 'FaceColor', 'flat');
+b.CData = colororder;
+b.FaceAlpha = 0.6;
+er = errorbar(xplotvals, mn_propcorrect, sem_propcorrect, 'Color','k');
+er.LineStyle = 'none';
+title('proportion wrong trials per day')
+
+
+%% save data for plotting and stats
+
+statsdir = '\\ad.gatech.edu\bme\labs\singer\Abby\code\chronicflicker-ephys-prospectivecoding\results\LMM_R\';
+filename = 'TableData_BehaviorPerformance_180_perDay_propCorrect.txt';
+writetable(PerfData, fullfile(statsdir, filename))
+
+%%% save data for figure
+statsdir = '\\ad.gatech.edu\bme\labs\singer\Abby\code\flicker-neuralcodes\results\behavior\';
+filename = 'Behavior_PropCorrect_PerDay_SupplementaryFigure.mat';
+save([statsdir, filename], 'PerfData')
+
 
 
 
