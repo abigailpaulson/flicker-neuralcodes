@@ -7,10 +7,10 @@ clear; close all
 [params, dirs, metadata, allindex] = projectInfo2('chronicflicker_annulartrack', 'condition', 'prepostVR');
 
 %% set run flags
-run.behaviorAnalysis = 0;
+run.behaviorAnalysis = 1;
 run.spatialMapAnalysis = 0; 
 run.currPositionDecoding = 0;
-run.thetaSeqDecoding = 1; 
+run.thetaSeqDecoding = 0; 
 run.rippleDecoding = 0;
 run.flickerSequences = 0; 
 run.rippleProperties = 0;
@@ -33,13 +33,14 @@ if run.currPositionDecoding
 end
 
 if run.thetaSeqDecoding
-    cf_decoding_thetaseq_table_ctrlspeed(dirs, params, allindex, metadata, 'd2r', 'PC') % correct control speed
+    cf_decoding_thetaseq_360dec_180trialsplit_seqlength(dirs, params, allindex, metadata, 'full', 'PC') % correct control speed
 end
 
 if run.rippleDecoding
 %     allindex = allindex(allindex(:,2) == 200831,:); %example day
     %cf_decoding_ripples(dirs, params, allindex, metadata, 'd2r', 'PC')
-    cf_decoding_ripples_table(dirs, params, allindex, metadata, 'd2r', 'PC')
+    %cf_decoding_ripples_table(dirs, params, allindex, metadata, 'd2r', 'PC')
+    cf_decoding_ripples_table(dirs, params, allindex, metadata, 'full', 'PC')
 end
 
 if run.rippleProperties
