@@ -13,7 +13,7 @@ load([SavePathLoad '6bandflickerhilbertPPCresultsCrossCAShankColPyrChAveSh12Notc
 % % SavePathRaw=[SavePathLoad '13bandHirearchy\'];
 % % mkdir(SavePathRaw)
 %%%%%%%%%%Integrate VR results
-SavePathRaw=['\\ad.gatech.edu\bme\labs\singer\Abby\code\chronicflicker-ephys-prospectivecoding\results\PPC\Manuscript\'];
+SavePathRaw=['\\ad.gatech.edu\bme\labs\singer\Abby\code\flicker-neuralcodes\results\PPC\Manuscript\'];
 mkdir(SavePathRaw)
 SavePathRaw=[SavePathRaw '6bandCACrossShankColVRFlickerNotch40\'];
 mkdir(SavePathRaw)
@@ -489,11 +489,42 @@ for iFF=1:length(FI)
         title([CellName{iCell} ' ', ViolinPlotName{3}, ' ', num2str(length(DataPlot{3})), ' ', ViolinPlotName{4}, ' ', num2str(length(DataPlot{4}))]);
         
         txtentry = [RegionName{iReg}, ' ', CellName{iCell}, ' ' FreName2{jFF}];
-        cf_stats2txt2(DataPlot(3:4), statsFID, txtentry, 'cells', 'PPC', 'PPC', StimName)
+        %cf_stats2txt2(DataPlot(3:4), statsFID, txtentry, 'cells', 'PPC', 'PPC', StimName)
         xlabel(FreName2{jFF});
         
         figname = [RegionName{iReg} '_', CellName{iCell}, '_', FreName{jFF}];
-        savefigALP(SavePathRaw, figname)
+        %savefigALP(SavePathRaw, figname)
+        
+        %%% per animal plots
+        vdat = [];
+        stimnames = {'', '', 'random', 'gamma'};
+        figure('Units', 'inches', 'Position', [0 0 6.5 1.8])
+        hold on
+        cmat = [];
+        iPlot = 1;
+        for sg = 3:4
+            animals = unique(xSubj{sg});
+            nUnitsTemp = tabulate(xSubj{sg});
+            tmpAn = ismember(nUnitsTemp(:,1), animals);
+            nUnits = nUnitsTemp(tmpAn,2);
+            for an = 1:length(animals)
+                isDat = xSubj{sg} == animals(an);
+                vdat.(['an', num2str(animals(an))]) = DataPlot{sg}(isDat);
+                cmat{iPlot} = PlotColor4(sg,:);
+                iPlot = iPlot+1;
+            end
+            disp(['Flicker ', stimnames{sg}, ' ', CellName{iCell} ' ', FreName{jFF}, ' ', RegionName{iReg}, ' cell range: ', num2str(min(nUnits)), ' - ', num2str(max(nUnits))])
+        end
+        v = violinplot(vdat, [], 'BoxWidth', 0.02, 'ShowData', false);
+        for vv = 1:length(v)
+            v(vv).ViolinColor = cmat{vv};
+            v(vv).BoxColor = cmat{vv};
+        end
+        ylabel([RegionName{iReg}, ' PPC'])
+        title(['Flicker ', CellName{iCell} ' ', FreName{jFF}, ' ', RegionName{iReg}]);
+        figname = ['PerAnimal', RegionName{iReg}, '_', CellName{iCell}, '_', FreName{jFF}];
+        makefigurepretty(gcf, 1)
+        %savefigALP(SavePathRaw, figname, 'ftype', 'pdf')
         
         %%%%PosXY(1,:): x coordinate;PosXY(2,:): y coordinate; coordinate of plot
         %%%%PosXY(3,:): x coordinate;PosXY(4,:): y coordinate; coordinate of labels

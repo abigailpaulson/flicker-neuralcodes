@@ -5,7 +5,7 @@ load([LoadData 'StimInfoList.mat'],'StimFileList');
 SavePathLoad='\\ad.gatech.edu\bme\labs\singer\LuZhang\Project2ChronicF\Results\step4\';
 
 
-SavePathRaw=['\\ad.gatech.edu\bme\labs\singer\Abby\code\chronicflicker-ephys-prospectivecoding\results\PPC\Manuscript\'];
+SavePathRaw=['\\ad.gatech.edu\bme\labs\singer\Abby\code\flicker-neuralcodes\results\PPC\Manuscript\'];
 if ~exist(SavePathRaw, 'dir')
 mkdir(SavePathRaw)
 end
@@ -279,7 +279,7 @@ for jTh=1:length(SpikeThAll)
     
     
     clear UnPairedDayFlicker
-    for iGroup=1:3 %iGroup = 3 is correct trial, 1 is all trial
+    for iGroup=1 %iGroup = 3 is correct trial, 1 is all trial %using all trials ALP 5/2/24
 
         if iGroup==2
             continue;
@@ -376,7 +376,7 @@ for jTh=1:length(SpikeThAll)
                     GroupPair.SignY=YlimCell(iCell,2);
                     GroupPair.LimY=[0 YlimCell(iCell,2)];
                     clear DataPlot xSubjID DataPlotName;
-                    DataPlot={}; xSubjID={}; DataPlotName={}; ViolinPlotName = {}; xCellID = {};
+                    DataPlot={}; xSubjID={}; DataPlotName={}; ViolinPlotName = {}; xCellID = {}; xAnID = {};%ALP added 5/9/24
                     for iDay=1:size(DayGroup,1)
                         
                         for iS=1:length(StimGroup)
@@ -396,7 +396,8 @@ for jTh=1:length(SpikeThAll)
                                 continue;
                             end
                             DataPlot{end+1}=squeeze(PPCvr(CellNeed,jFF,iGroup));
-                            xSubjID{end+1}=CellAllProp.SubjFile(CellNeed);
+                            xSubjID{end+1}=CellAllProp.SubjFile(CellNeed); %this is the day index (1:64)
+                            xAnID{end+1}=CellAllProp.Subj(CellNeed); %ALP 5/9/24 this is the animal ID
                             xCellID{end+1} = CellAllProp.CellID(CellNeed); % ALP 9/20/23
                             DataPlotName{end+1}=[DayName{iDay} ' ' StimName{iS} ', n =' num2str(length(DataPlot{end}))];
                             ViolinPlotName{end+1} = [DayName{iDay}, '_', StimName{iS}];
@@ -410,7 +411,7 @@ for jTh=1:length(SpikeThAll)
                     %%% get data for stats ALP 9/15/23
                     for sg = 3:4 %stats group
                         tmp = []; tmpgroup = []; tmpreg = []; tmpfreq = [];
-                        tmp = [DataPlot{sg} xSubjID{sg} xCellID{sg}];
+                        tmp = [DataPlot{sg} xAnID{sg} xCellID{sg}]; %edited from xSubjID to xAnID ALP 5/22/24
                         tmpgroup = sg.*ones(size(tmp,1),1);
                         tmpreg = iReg.*ones(size(tmp,1),1);
                         tmpfreq = iFF.*ones(size(tmp,1),1);
@@ -447,7 +448,41 @@ for jTh=1:length(SpikeThAll)
                     xlabel(FreName2{jFF});
                     
                     figname = [RegionName{iReg}, '_', CellName{iCell}, '_', FreName{jFF}];
-%                     savefigALP(SaveTemp, figname)
+                    savefigALP(SaveTemp, figname)
+                    
+                    
+                    %%% per animal plots
+                    vdat = [];
+                    stimname = {'', '', 'random', 'gamma'};
+                    figure('Units', 'inches', 'Position', [0 0 6.5 1.8])
+                    hold on
+                    cmat = [];
+                    iPlot = 1;
+                    for sg = 3:4
+                        animals = unique(xAnID{sg});
+                        nUnitsTemp = tabulate(xAnID{sg});
+                        tmpAn = ismember(nUnitsTemp(:,1), animals);
+                        nUnits = nUnitsTemp(tmpAn,2);
+                        for an = 1:length(animals)
+                            isDat = xAnID{sg} == animals(an);
+                            vdat.(['an', num2str(animals(an))]) = DataPlot{sg}(isDat);
+                            cmat{iPlot} = PlotColor4(sg,:);
+                            iPlot = iPlot+1;
+                        end
+                       disp(['VR ' stimname{sg}, ' ', CellName{iCell} ' ', FreName{jFF}, ' ', RegionName{iReg}, ' cell range: ', num2str(min(nUnits)), ' - ', num2str(max(nUnits))])
+
+                    end
+                    v = violinplot(vdat, [], 'BoxWidth', 0.02, 'ShowData', false);
+                    for vv = 1:length(v)
+                        v(vv).ViolinColor = cmat{vv};
+                        v(vv).BoxColor = cmat{vv};
+                    end
+                    ylabel([RegionName{iReg}, ' PPC'])
+                    title([CellName{iCell} ' ', FreName{jFF}, ' ', RegionName{iReg}]);
+                    figname = ['PerAnimal', RegionName{iReg}, '_', CellName{iCell}, '_', FreName{jFF}];
+                    makefigurepretty(gcf, 1)
+                    %savefigALP(SaveTemp, figname, 'ftype', 'pdf')
+                    
                     %%%% end ALP
                     
                     %PathSave=[SaveTempF RegionName{iReg} CellName{iCell} FreName{jFF} '.txt'];
@@ -498,7 +533,7 @@ for jTh=1:length(SpikeThAll)
             %data for stats
             %data animalID groupID regionID frequencyID
             PPCTable = array2table(dataforstats, 'VariableNames', {'ppc', 'anID', 'cellID', 'groupID', 'regID', 'freqID'});
-            tablefilename = ['\\ad.gatech.edu\bme\labs\singer\Abby\code\chronicflicker-ephys-prospectivecoding\results\LMM_R\', 'TableData_PPC_VR_CrossReg_', CellName{iCell}, '.txt']; 
+            tablefilename = ['\\ad.gatech.edu\bme\labs\singer\Abby\code\flicker-neuralcodes\results\LMM_R\', 'TableData_PPC_VR_CrossReg_', CellName{iCell}, '_', GroupName{iGroup} '.txt']; %added groupname ALP 5/2/24 
             writetable(PPCTable, tablefilename)
             
             clear dataforstats
