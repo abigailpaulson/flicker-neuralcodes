@@ -24,19 +24,25 @@ tablefilename = [figdir, tablefilename];
 f1 = figure('units','inch','position',[0,0,6.5,6]);
 
 %% behavior example
-ax_a = makesubplotwithletter(f1,5,4, 1, 'A', 'spanW', 1.85);
+ax_a = makesubplotwithletter(f1,5,4, 1, 'C', 'spanW', 1.85);
 cf_getbehavior_fulltrack(dirs, params, allindex, metadata, f1, ax_a)
 
 %% behavior, by zones and by groups
-ax_b = makesubplotwithletter(f1,5,4, 3, 'B', 'spanW', 0.95);
-ax_c = makesubplotwithletter(f1,5,4, 4, 'C', 'spanW', 0.95);
-ax_d = makesubplotwithletter(f1,5,4, 5, 'D');
-ax_e = makesubplotwithletter(f1,5,4, 6, 'E');
-ax_f = makesubplotwithletter(f1,5,4, 7, 'F');
-ax_g = makesubplotwithletter(f1,5,4, 8, 'G');
+ax_d = makesubplotwithletter(f1,4,4, 3, 'D', 'spanW', 0.95);
+ax_e = makesubplotwithletter(f1,4,4, 4, 'E', 'spanW', 0.95);
+ax_f = makesubplotwithletter(f1,4,4, 5, 'F');
+ax_g = makesubplotwithletter(f1,4,4, 6, 'G');
+ax_h = makesubplotwithletter(f1,4,4, 7, 'H');
+ax_i = makesubplotwithletter(f1,4,4, 8, 'I');
 
 cf_plot_behaviorperformance_zones_table(dirs, params, allindex, metadata, ...
-    f1, {ax_b, ax_c, ax_d, ax_e, ax_f, ax_g}, statsFID, {'B', 'C', 'D', 'E', 'F', 'G'}, tablefilename)
+    f1, {ax_d, ax_e, ax_f, ax_g, ax_h, ax_i}, statsFID, {'D', 'E', 'F', 'G', 'H', 'I'}, tablefilename)
+
+%% behavior, plot proportion of trials correct
+ax_j = makesubplotwithletter(f1,4,4, 9, 'J');
+
+cf_plot_behaviorperformance_overall_perday(dirs, params, allindex, metadata, ...
+    f1, {ax_j}, statsFID, {'J'}, tablefilename)
 
 %% recording location per day
 %saving this directly to a pdf bcuz it would be too confusing to have to
@@ -44,8 +50,9 @@ cf_plot_behaviorperformance_zones_table(dirs, params, allindex, metadata, ...
 % ax_h = makesubplotwithletter(f1,6,4, 9, 'H', 'nosubplot');
 % ax_i = makesubplotwithletter(f1,6,4, 17, 'I', 'nosubplot');
 
-cf_recordinglocation_ripplepower(dayindex, metadata, 'CA1', figdir)
-cf_recordinglocation_ripplepower(dayindex, metadata, 'CA3', figdir)
+%ALP 5/16/24 commenting the below out because I don't need to replot them
+%cf_recordinglocation_ripplepower(dayindex, metadata, 'CA1', figdir)
+%cf_recordinglocation_ripplepower(dayindex, metadata, 'CA3', figdir)
 
 %% final touches
 fclose(statsFID); %close the stats file

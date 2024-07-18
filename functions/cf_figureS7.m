@@ -29,7 +29,7 @@ ax_e = makesubplotwithletter(fh,3,4, 11, 'E', 'spanW', 1.9);
 
 
 cf_plot_360decoding_unoccpiedzone(dirs, params, allindex, metadata, fh, ...
-    {ax_a, ax_b, ax_c, ax_d, ax_e,}, statsFID, {'A', 'A', 'B', 'B', 'C', 'C', 'D', 'D', 'E', 'E'}, tablefilename)
+    {ax_a, ax_b, ax_c, ax_d, ax_e,}, statsFID, {'A1', 'A2', 'B1', 'B2', 'C1', 'C2', 'D1', 'D2', 'E1', 'E2'}, tablefilename)
 
 %% finish stuff up
 %close stats file

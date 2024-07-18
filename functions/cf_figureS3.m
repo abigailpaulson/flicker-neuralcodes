@@ -18,7 +18,7 @@ tablefilename = [figname, '_stats_'];
 tablefilename = [figdir, tablefilename];
 
 %% initialize figure
-fh = figure('units','inch','position',[0,0,6.5,7.5]);
+fh = figure('units','inch','position',[0,0,6.5,9]);
 
 %% Panel A and B are the images of place cells throughout the track
 % 360 deegree version is in A and 180 version is in B
@@ -48,18 +48,27 @@ cf_plot_thetaseq_strength(dirs, params, allindex, metadata, fh, {ax_g}, statsFID
 
 %% theta sequences 180 per trial
 ax_h = makesubplotwithletter(fh,5,4,10,'H', 'spanW', 1.9); %line plot through space
-ax_i = makesubplotwithletter(fh,5,4,12,'I');
+ax_i = makesubplotwithletter(fh,5,5,16,'I');
 cf_plot_thetadecoding_results_trial(dirs, params, allindex, metadata, fh, {ax_h, ax_i}, statsFID, {'H', 'I'}, tablefilename)
+
+%% theta sequences compared to control zone
+ax_j = makesubplotwithletter(fh,5,5,17,'J', 'spanW', 1.9); %was span 1.9
+cf_plot_thetadecoding_results_trial_vs_control(dirs, params, allindex, metadata, fh, {ax_j}, statsFID, {'J1', 'J2'}, tablefilename)
+
+%% theta sequences with anticipatory licking
+ax_k = makesubplotwithletter(fh,5,5,19,'K','spanW', 1.9);
+
+cf_plot_thetadecoding_results_trial_PCR_vs_anticipatorylicking(dirs, params, allindex, metadata, fh, {ax_k}, statsFID, {'K1', 'K2'}, tablefilename)
 
 
 %% current position decoding 
 %decoding current position just 180 for now
 
-ax_j1 = makesubplotwithletter(fh,5,4,13,'J'); %line plot through space
-ax_j2 = makesubplotwithletter(fh,5,4,14,'J'); %line plot through space
-ax_k = makesubplotwithletter(fh, 5,4,15, 'K');
+ax_l1 = makesubplotwithletter(fh,5,4,17,'L'); %line plot through space
+ax_l2 = makesubplotwithletter(fh,5,4,18,'L'); %line plot through space
+ax_m = makesubplotwithletter(fh, 5,4,19, 'M');
 
-cf_plot_currPosDecoding(dirs, params, allindex, metadata, fh, {ax_j1, ax_j2, ax_k}, statsFID, {'J', 'J', 'K'}, tablefilename)
+cf_plot_currPosDecoding(dirs, params, allindex, metadata, fh, {ax_l1, ax_l2, ax_m}, statsFID, {'L1', 'L2', 'M'}, tablefilename)
 
 
 %% finish stuff up

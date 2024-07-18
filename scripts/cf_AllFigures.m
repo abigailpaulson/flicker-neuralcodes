@@ -10,7 +10,7 @@ clear
 run.figure1 = 0;
 run.figure2 = 0;
 run.figure3 = 0;
-run.figure4 = 1;    
+run.figure4 = 0;    
 run.figure5 = 0;
 
 run.figureS1 = 0;
@@ -18,6 +18,10 @@ run.figureS2 = 0;
 run.figureS3 = 0;
 run.figureS4 = 0;
 run.figureS5 = 0;
+run.figureS6 = 0;
+run.figureS7 = 0;
+
+run.revieweronly1 = 1;
 
 %% figure 1
 if run.figure1
@@ -50,4 +54,16 @@ end
 
 if run.figureS5
     cf_figureS5(dirs, params, allindex, metadata)
+end
+
+if run.figureS6 % now supplementary figure 7
+    cf_figureS6(dirs, params, allindex, metadata)
+end
+
+if run.figureS7
+    cf_figureS7(dirs, params, allindex, metadata)
+end
+
+if run.revieweronly1
+    cf_revieweronly1(dirs, params, allindex, metadata)
 end
