@@ -51,6 +51,7 @@ for d = 1:size(dayindex,1)
     duration = NaN(nTrials,1); 
     lickDI = NaN(nTrials,1);
     nLicks = NaN(nTrials,1); 
+    nLicksAZ = NaN(nTrials,1);
     nRewards = NaN(nTrials,1);
     licklatency_s = NaN(nTrials,1);
     licklatency_pos = NaN(nTrials,1);
@@ -102,6 +103,7 @@ for d = 1:size(dayindex,1)
         relativelicktime = RZlicktime - RZtime(1);
         lickDI(t) = (sum(licks(inRZ|inAZ))-sum(licks(inCtrl)))/(sum(licks));
         nLicks(t) = length(lickpos);
+        nLicksAZ(t) = sum(licks(inAZ));
         nRewards(t) = length(rewards);
         
         if ~isempty(relativelicktime)
@@ -175,55 +177,37 @@ for d = 1:size(dayindex,1)
         nRewards, licklatency_s, licklatency_pos, trial_speed, AZ_speed, RZ_speed, ...
         Ctrl_speed, AZ_speed_slope, AZ_lick_slope, RRZ_time_below_thresh, RRZ_time_below_thresh_prop, enter_RZ, ...
         leave_RZ, time_2_nextRZ, low_speed_pos, high_speed_pos, postRZ_speed, zone, engaged, ...
-        fullTrial, rewarded, trialNum, day, animal, group, timepoint);
+        fullTrial, rewarded, trialNum, day, animal, group, timepoint, nLicksAZ);
     
     %%% append to large structures
     allTMetrics = [allTMetrics; metrics];
     allTData = [allTData trialData];
     
-    savedatadir = ['\\ad.gatech.edu\bme\labs\singer\Abby\code\chronicflicker-ephys-prospectivecoding\results\behavior\'];
-    savefilename = ['behavioranalysis_prepost_recordings_table_v2_', num2str(dayindex(d,2)), '.mat'];
-    save([savedatadir, savefilename], 'metrics')
+%     savedatadir = ['\\ad.gatech.edu\bme\labs\singer\Abby\code\chronicflicker-ephys-prospectivecoding\results\behavior\'];
+%     savefilename = ['behavioranalysis_prepost_recordings_table_v2_', num2str(dayindex(d,2)), '.mat'];
+%     save([savedatadir, savefilename], 'metrics')
     
     clear metrics
 end
 
-statsdir = '\\ad.gatech.edu\bme\labs\singer\Abby\code\chronicflicker-ephys-prospectivecoding\results\LMM_R\'; 
-%%% set up data structure for LMM in R
-isRandom = strcmp(allTMetrics.group, 'random');
-group = isRandom+1; %GROUP 1 is GAMMA and GROUP 2 is RANDOM!!!!!
-isPost = strcmp(allTMetrics.timepoint, 'post');
-timepoint = isPost+1; 
-newInfo = table(group, timepoint);
-behaviorData = [allTMetrics(:,3:end-2) newInfo];
-
-inclTrial = allTMetrics.fullTrial & allTMetrics.engaged & allTMetrics.rewarded;
-dayData = groupsummary(behaviorData(inclTrial,:), "day", "mean");
-writetable(behaviorData, fullfile(statsdir, ['TableData_Behavior_Trial_v2.txt']));   
-writetable(dayData, fullfile(statsdir, ['TableData_Behavior_Day_v2.txt']));   
+%commented out ALP 4/16/24
+% statsdir = '\\ad.gatech.edu\bme\labs\singer\Abby\code\chronicflicker-ephys-prospectivecoding\results\LMM_R\'; 
+% %%% set up data structure for LMM in R
+% isRandom = strcmp(allTMetrics.group, 'random');
+% group = isRandom+1; %GROUP 1 is GAMMA and GROUP 2 is RANDOM!!!!!
+% isPost = strcmp(allTMetrics.timepoint, 'post');
+% timepoint = isPost+1; 
+% newInfo = table(group, timepoint);
+% behaviorData = [allTMetrics(:,3:end-2) newInfo];
+% 
+% inclTrial = allTMetrics.fullTrial & allTMetrics.engaged & allTMetrics.rewarded;
+% dayData = groupsummary(behaviorData(inclTrial,:), "day", "mean");
+% writetable(behaviorData, fullfile(statsdir, ['TableData_Behavior_Trial_v2.txt']));   
+% writetable(dayData, fullfile(statsdir, ['TableData_Behavior_Day_v2.txt']));   
 
 units = {'lick count', 'raw speed (deg/s)', 'fraction of licks', 'norm speed (deg/s)', 'DI', 'latency (s)',...
     'latency (deg)', 'avg speed (deg/s)', 'avg speed (deg/s)', 'avg speed (deg/s)',...
     'avg speed (deg/s)', 'slope', 'slope'}; 
-
-tmpdat1 = allTMetrics.trial_speed(inclTrial & strcmp(allTMetrics.group, 'gamma') & strcmp(allTMetrics.timepoint, 'pre'));
-tmpdat2 = allTMetrics.trial_speed(inclTrial & strcmp(allTMetrics.group, 'random') & strcmp(allTMetrics.timepoint, 'pre'));
-tmpdat3 = allTMetrics.trial_speed(inclTrial & strcmp(allTMetrics.group, 'gamma') & strcmp(allTMetrics.timepoint, 'post'));
-tmpdat4 = allTMetrics.trial_speed(inclTrial & strcmp(allTMetrics.group, 'random') & strcmp(allTMetrics.timepoint, 'post'));
-% 
-% figure
-% hold on
-% raincloud_plot(tmpdat1, 'box_on', 1, 'box_dodge', 1, 'box_dodge_amount', 0.15, 'dot_dodge_amount', 0.35, 'color', rgb('slateblue'), 'alpha', 0.5, 'box_col_match', 0, 'linewidth', 1)
-% raincloud_plot(tmpdat2, 'box_on', 1, 'box_dodge', 1, 'box_dodge_amount', 0.55, 'dot_dodge_amount', 0.75, 'color', rgb('mediumspringgreen'), 'alpha', 0.5, 'box_col_match', 0, 'linewidth', 1)
-% makefigurepretty(gcf)
-% 
-% figure
-% hold on
-% subplot(2,1,1)
-% raincloud_plot(tmpdat1, 'box_on', 1, 'color', rgb('slightly dark slateblue'), 'alpha', 0.5, 'box_col_match', 0)
-% subplot(2,1,2)
-% raincloud_plot(tmpdat2, 'box_on', 1, 'color', rgb('slightly dark mediumspringgreen'), 'alpha', 0.5, 'box_col_match', 0)
-% makefigurepretty(gcf)
 
 
 %%%%% ----- SAVE ----- %%%%%
@@ -231,7 +215,7 @@ savedatadir = ['\\ad.gatech.edu\bme\labs\singer\Abby\code\chronicflicker-ephys-p
 info = [];
 info = addhelpfulinfotostruct(info);
 info.units = units;
-savefilename = 'behavioranalysis_prepost_recordings_table_v2.mat';
+savefilename = 'behavioranalysis_prepost_recordings_table_240416.mat';
 save([savedatadir, savefilename], 'allTMetrics', 'allTData', 'info')
 
 end
