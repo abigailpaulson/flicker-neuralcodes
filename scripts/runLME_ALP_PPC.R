@@ -10,7 +10,7 @@ library(report)
 library(ggplot2)
 
 #load MATLAB output (in table format in .txt) file in R
-foldN = "//ad.gatech.edu/bme/labs/singer/Abby/code/chronicflicker-ephys-prospectivecoding/results/LMM_R/"
+foldN = "//ad.gatech.edu/bme/labs/singer/Abby/code/flicker-neuralcodes/results/LMM_R/"
 
 ##### PPC DATA! ##### 
 ## load data file
@@ -20,8 +20,8 @@ dtt <- c("ppc_crossreg_pyr", "ppc_crossreg_in")
 
 for (PPCt in PPCtype) {
   for (CT in celltype) {
-    fileN <- paste("TableData_PPC_", PPCt, "_CrossReg_", CT, ".txt", sep = "")
-    dt <- paste("ppc_crossreg_", PPCt, "_", CT, sep = "")
+    fileN <- paste("TableData_PPC_", PPCtype, "_CrossReg_", CT, "_AllTrial.txt", sep = "")
+    dt <- paste("ppc_crossreg_", PPCtype, "_", CT, sep = "")
 
     #initialize table structure to add stats to
     outputStats = data.frame()
