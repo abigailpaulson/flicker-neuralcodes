@@ -44,26 +44,30 @@ qs = [min(BehavData.(splitname)) qs max(BehavData.(splitname))];
 iQ = discretize(BehavData.(splitname), qs);
 
 %%% plot scatterplot, lick number and PCR
-figure
+figure('Position', [443 471 557 327])
 hold on
-plot(BehavData.nLicksAZ, PlotData.PCR_loc_trial,'.')
-
-% figure
-% hold on
-% iPlot = 1;
-% for g = [2,1]
-% subplot(1,2,iPlot)
-% hold on
-% isGroup = strcmp(PlotData.group, gnames{g});
-% 
-% plot(BehavData.nLicksAZ(isGroup), PlotData.PCR_loc_trial(isGroup),'.')
-% 
-% 
-% iPlot = iPlot+1;
-% end
+plot(BehavData.nLicksAZ, PlotData.PCR_loc_trial,'k.')
+%%% fit a line to the data
+incldat = ~isnan(PlotData.PCR_loc_trial) & ~isnan(BehavData.nLicksAZ);
+Ydat = PlotData.PCR_loc_trial(incldat);
+Xdat = BehavData.nLicksAZ(incldat);
+c = polyfit(Xdat, Ydat, 1);
+xvals_line = min(BehavData.nLicksAZ):1:max(BehavData.nLicksAZ);
+yvals_line = polyval(c,Xdat);
+% plot(Xdat, yvals_line, 'r-');
+SStot = sum((Ydat-mean(Ydat)).^2);                    % Total Sum-Of-Squares
+SSres = sum((Ydat-yvals_line).^2);                       % Residual Sum-Of-Squares
+Rsq = 1-SSres/SStot;                            % R^2
+[~,~,~,~, stats] = regress(Ydat,[ones(length(Xdat),1), Xdat]);
+title(['R2 = ', num2str(Rsq), ' N trials = ', num2str(sum(incldat))])
+xlabel('Number of licks')
+ylabel('Prospective coding ratio')
+savefigname = 'revieweronly_AZlicknumber_PCR_trial_bothgroups_postonly';
+savefigdir = '\\ad.gatech.edu\bme\labs\singer\Abby\code\flicker-neuralcodes\manuscriptfigures\';
+makefigurepretty(gcf,1);
+%savefigALP(savefigdir, savefigname, 'filetype', 'pdf', 'date', 1);
 
 %%% plot PCR by median licking
-
 d = 2; %cuz post only
 figure('Position', [409 402 303 217])
 hold on
@@ -76,7 +80,11 @@ for z = 1:2
         isPlotTrial = isGroup & iQ == z;
         vdat.([gnames{g}, 'lick', num2str(z)]) = PlotData.PCR_loc_trial(isPlotTrial);
         cmat = [cmat; params.colors.(gnames{g}).(dnames{z})];
-    end
+end
+    
+nAn = unique(PlotData.animal(isGroup));
+nDays  = unique(PlotData.day(isGroup));
+disp([gnames{g}, ' there are ', num2str(length(nAn)) ' animals and ', num2str(length(nDays)), ' days in the PCR vs. licking analysis'])
 end
 violinplot_half(vdat, [], 'ViolinColorMat', cmat, 'ShowData', false, 'BoxWidth', 0.018, 'MedianSize', 40, 'ViolinAlpha', 0.4);
 ylim([-0.75 0.75])
@@ -86,9 +94,9 @@ yticks([-0.75 0 0.75])
 ylabel('prospective coding ratio')
 title({'180 decoding', 'RRZ PCR by Lick #'})
 makefigurepretty(gcf)
-% filename = 'RRZ_PCR_pertrial_180decoding_nLickMedian';
-% figdir = '\\ad.gatech.edu\bme\labs\singer\Abby\code\chronicflicker-ephys-prospectivecoding\results\decoding_thetaseq\';
-% savefigALP(figdir, filename, 'filetype', 'pdf')
+filename = 'RRZ_PCR_pertrial_180decoding_nLickMedian';
+figdir = '\\ad.gatech.edu\bme\labs\singer\Abby\code\chronicflicker-ephys-prospectivecoding\results\decoding_thetaseq\';
+%savefigALP(figdir, filename, 'filetype', 'pdf')
 
 
 
@@ -104,13 +112,11 @@ statsdir = '\\ad.gatech.edu\bme\labs\singer\Abby\code\chronicflicker-ephys-prosp
 filename = 'TableData_RRZPCR_180_perTrial_postDataOnly_LickNumber.txt';
 writetable(StatsData, fullfile(statsdir, filename))
 
-yticks([-0.75 0 0.75])
-ylabel('prospective coding ratio')
-title({'180 decoding', 'RRZ PCR by Lick #'})
-makefigurepretty(gcf)
-filename = 'RRZ_PCR_pertrial_180decoding_nLickMedian';
-figdir = '\\ad.gatech.edu\bme\labs\singer\Abby\code\chronicflicker-ephys-prospectivecoding\results\decoding_thetaseq\';
-savefigALP(figdir, filename, 'filetype', 'pdf')
+%%% save data for figure
+PCRAnticipatoryLicking = StatsData; 
+statsdir = '\\ad.gatech.edu\bme\labs\singer\Abby\code\chronicflicker-ephys-prospectivecoding\results\decoding_thetaseq\';
+filename = 'ThetaSeq_TrialData_180Decoding__RRZ_by_AnticipatoryLickMedian_SupplementaryFigure.mat';
+save([statsdir, filename], 'PCRAnticipatoryLicking')
 
 
 
