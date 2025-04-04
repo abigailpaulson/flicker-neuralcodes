@@ -122,6 +122,10 @@ for g = 1:2
         vdat.([gnames{g}, '_', num2str(s)]) = postRPCR.PostR_PCR_loc_trial(isPlotTrial);
         cmat = [cmat; c.(gnames{g}).(snames{s})];
         datforstats{s} = postRPCR.PostR_PCR_loc_trial(isPlotTrial);
+        
+        %test for bimodality
+        [bf, bc] = bimodalitycoeff(datforstats{s});
+        disp([gnames{g}, ' speed ', num2str(s), ' bimodal ', num2str(bf), ' coeff = ', num2str(bc)])
     end
  cf_stats2txt2(datforstats, statfid, panelL{iStat}, 'trials', 'prospective coding ratio', 'postRewPCR_speed', snames, tablefilename)
 iStat = iStat+1;
